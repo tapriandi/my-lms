@@ -2,27 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
+use App\Filament\Resources\PermissionResource\Pages;
+use App\Filament\Resources\PermissionResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Pages\Page;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 
-class UserResource extends Resource
+class PermissionResource extends Resource
 {
-    protected static ?string $model = User::class;
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
+    protected static ?string $model = Permission::class;
+    protected static ?string $navigationIcon = 'heroicon-o-key';
     protected static ?string $navigationGroup = 'Settings';
 
     public static function form(Form $form): Form
@@ -32,16 +29,9 @@ class UserResource extends Resource
                 Section::make()->schema([
                     TextInput::make('name')
                         ->required()
-                        ->maxLength(100),
-                    TextInput::make('email')
-                        ->email()
-                        ->required()
-                        ->maxLength(100),
-                    TextInput::make('password')
-                        ->required()
-                        ->minLength(8)
-                        ->dehydrated(fn ($state) => filled($state))
-                        ->dehydrateStateUsing(fn ($state) => Hash::make($state)),
+                        ->minLength(3)
+                        ->maxLength(100)
+                        ->unique(ignoreRecord: true)
                 ])
             ]);
     }
@@ -51,8 +41,7 @@ class UserResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('no')->rowIndex(),
-                TextColumn::make('name')->limit(50),
-                TextColumn::make('email')->limit(50),
+                TextColumn::make('name')->sortable(),
             ])
             ->filters([
                 //
@@ -77,9 +66,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListPermissions::route('/'),
+            'create' => Pages\CreatePermission::route('/create'),
+            'edit' => Pages\EditPermission::route('/{record}/edit'),
         ];
     }
 }
