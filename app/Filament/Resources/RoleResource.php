@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
@@ -31,7 +32,11 @@ class RoleResource extends Resource
                         ->required()
                         ->minLength(3)
                         ->maxLength(100)
-                        ->unique(ignoreRecord: true)
+                        ->unique(ignoreRecord: true),
+                    Select::make('permissions')
+                        ->preload()
+                        ->multiple()
+                        ->relationship('permissions', 'name')
                 ])
             ]);
     }
